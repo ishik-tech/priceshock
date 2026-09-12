@@ -1,0 +1,19 @@
+# Web framework
+fastapi>=0.115
+uvicorn[standard]>=0.30
+
+# Configuration
+python-dotenv>=1.0
+
+# Data validation
+pydantic>=2.7
+
+# Database
+sqlalchemy>=2.0
+
+# Data / ML pipeline
+numpy>=1.26
+pandas>=2.2
+scikit-learn>=1.4
+statsmodels>=0.14
+joblib>=1.3

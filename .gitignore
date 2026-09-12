@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# ML Models and Data
+ml/models/*.pkl
+ml/models/*.joblib
+ml/data/processed/*
+ml/data/raw/*.csv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+.pytest_cache/
+
+# Docker
+docker-compose.override.yml
+
+# Benchmark results (generated)
+docs/benchmark-results.md
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Local scratch/temp scripts
+_*_tmp.py
