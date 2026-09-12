@@ -7,14 +7,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import init_db
-from app.routes import health, products, forecasts, risk, dashboard, alerts
+from app.routes import alerts, dashboard, forecasts, health, products, risk
 
 # Windows consoles default to cp1252, which cannot encode some log characters.
 for _stream in (sys.stdout, sys.stderr):
-    try:
-        _stream.reconfigure(encoding="utf-8", errors="replace")
-    except (AttributeError, ValueError):  # pragma: no cover - non-reconfigurable stream
-        pass
+    _reconfigure = getattr(_stream, "reconfigure", None)
+    if callable(_reconfigure):
+        try:
+            _reconfigure(encoding="utf-8", errors="replace")
+        except ValueError:  # pragma: no cover - non-reconfigurable stream
+            pass
 
 
 @asynccontextmanager

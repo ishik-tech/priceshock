@@ -1,14 +1,14 @@
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-from typing import List, Dict, Optional
 import os
+from datetime import datetime, timedelta
+
+import numpy as np
+import pandas as pd
 from sqlalchemy.orm import Session
 
-from app.models.price_observation import PriceObservation
-from app.models.forecast_run import ForecastRun
 from app.models.forecast_prediction import ForecastPrediction
+from app.models.forecast_run import ForecastRun
 from app.models.model_metrics import ModelMetrics
+from app.models.price_observation import PriceObservation
 
 
 class ForecastingService:
@@ -62,8 +62,8 @@ class ForecastingService:
         self,
         product_id: int,
         horizon_days: int = 30,
-        model_name: Optional[str] = None
-    ) -> Optional[Dict]:
+        model_name: str | None = None
+    ) -> dict | None:
         """Generate forecast for a product"""
 
         df = self.get_price_history(product_id)
@@ -126,7 +126,7 @@ class ForecastingService:
             "expected_change_pct": expected_change_pct,
         }
 
-    def _naive_forecast(self, df: pd.DataFrame, horizon: int, last_date: datetime) -> List[Dict]:
+    def _naive_forecast(self, df: pd.DataFrame, horizon: int, last_date: datetime) -> list[dict]:
         """Simple naive forecast"""
         last_price = float(df["price"].iloc[-1])
         recent_std = float(df["price"].tail(30).std()) if len(df) >= 30 else float(df["price"].std())
@@ -146,7 +146,7 @@ class ForecastingService:
 
         return predictions
 
-    def _seasonal_naive_forecast(self, df: pd.DataFrame, horizon: int, last_date: datetime) -> List[Dict]:
+    def _seasonal_naive_forecast(self, df: pd.DataFrame, horizon: int, last_date: datetime) -> list[dict]:
         """Seasonal naive forecast"""
         predictions = []
         recent_std = float(df["price"].tail(30).std()) if len(df) >= 30 else float(df["price"].std())
@@ -159,7 +159,7 @@ class ForecastingService:
                     seasonal_price = float(df.loc[last_year_date, "price"])
                 else:
                     seasonal_price = float(df["price"].mean())
-            except:
+            except (KeyError, ValueError, TypeError):
                 seasonal_price = float(df["price"].mean())
 
             predictions.append({
@@ -172,7 +172,7 @@ class ForecastingService:
 
         return predictions
 
-    def _arima_forecast(self, df: pd.DataFrame, horizon: int, last_date: datetime) -> List[Dict]:
+    def _arima_forecast(self, df: pd.DataFrame, horizon: int, last_date: datetime) -> list[dict]:
         """ARIMA forecast"""
         try:
             from statsmodels.tsa.arima.model import ARIMA
@@ -200,7 +200,7 @@ class ForecastingService:
             print(f"ARIMA failed: {e}")
             return self._seasonal_naive_forecast(df, horizon, last_date)
 
-    def _random_forest_forecast(self, df: pd.DataFrame, horizon: int, last_date: datetime) -> List[Dict]:
+    def _random_forest_forecast(self, df: pd.DataFrame, horizon: int, last_date: datetime) -> list[dict]:
         """Random Forest forecast"""
         try:
             from sklearn.ensemble import RandomForestRegressor
@@ -220,7 +220,11 @@ class ForecastingService:
             if len(df_features) < 30:
                 return self._seasonal_naive_forecast(df, horizon, last_date)
 
-            feature_cols = ["day_of_week", "month", "day_of_year", "price_lag1", "price_lag7", "price_lag30", "rolling_mean_7", "rolling_std_7"]
+            feature_cols = [
+                "day_of_week", "month", "day_of_year",
+                "price_lag1", "price_lag7", "price_lag30",
+                "rolling_mean_7", "rolling_std_7",
+            ]
             X = df_features[feature_cols]
             y = df_features["price"]
 
@@ -258,7 +262,7 @@ class ForecastingService:
             print(f"Random Forest failed: {e}")
             return self._seasonal_naive_forecast(df, horizon, last_date)
 
-    def evaluate_model(self, df: pd.DataFrame, model_name: str) -> Dict:
+    def evaluate_model(self, df: pd.DataFrame, model_name: str) -> dict:
         """Evaluate model performance on test data"""
         if len(df) < 90:
             return {"error": "Insufficient data"}
@@ -270,8 +274,8 @@ class ForecastingService:
         if len(test) < 7:
             return {"error": "Insufficient test data"}
 
-        predictions = []
-        actuals = []
+        prediction_list: list[float] = []
+        actual_list: list[float] = []
 
         for i in range(len(test) - 1):
             train_window = pd.concat([train, test.iloc[:i+1]])
@@ -279,27 +283,34 @@ class ForecastingService:
             if model_name == "seasonal_naive":
                 try:
                     last_year = test.index[i] - timedelta(days=365)
-                    pred = float(df.loc[last_year, "price"]) if last_year in df.index else float(train_window["price"].mean())
-                except:
+                    if last_year in df.index:
+                        pred = float(df.loc[last_year, "price"])
+                    else:
+                        pred = float(train_window["price"].mean())
+                except (KeyError, ValueError, TypeError):
                     pred = float(train_window["price"].mean())
             else:
                 pred = float(train_window["price"].iloc[-1])
 
-            predictions.append(pred)
-            actuals.append(float(test["price"].iloc[i+1]))
+            prediction_list.append(pred)
+            actual_list.append(float(test["price"].iloc[i+1]))
 
-        predictions = np.array(predictions)
-        actuals = np.array(actuals)
+        predictions_arr = np.array(prediction_list)
+        actuals_arr = np.array(actual_list)
 
-        errors = np.abs(predictions - actuals)
+        errors = np.abs(predictions_arr - actuals_arr)
         mae = float(np.mean(errors))
         rmse = float(np.sqrt(np.mean(errors ** 2)))
-        mape = float(np.mean(np.abs((actuals - predictions) / actuals)) * 100) if np.all(actuals != 0) else None
+        mape = (
+            float(np.mean(np.abs((actuals_arr - predictions_arr) / actuals_arr)) * 100)
+            if np.all(actuals_arr != 0)
+            else None
+        )
 
         return {
             "model_name": model_name,
             "mae": mae,
             "rmse": rmse,
             "mape": mape,
-            "test_samples": len(predictions),
+            "test_samples": len(prediction_list),
         }

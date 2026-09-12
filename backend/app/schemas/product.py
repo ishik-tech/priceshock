@@ -1,6 +1,6 @@
-from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+
+from pydantic import BaseModel
 
 
 class ProductBase(BaseModel):
@@ -8,7 +8,7 @@ class ProductBase(BaseModel):
     category: str
     unit: str
     region: str = "National"
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class ProductCreate(ProductBase):
@@ -18,7 +18,7 @@ class ProductCreate(ProductBase):
 class ProductResponse(ProductBase):
     id: int
     created_at: datetime
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
 
     class Config:
         from_attributes = True

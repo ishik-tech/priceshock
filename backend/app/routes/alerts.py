@@ -1,10 +1,10 @@
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from typing import List
 
 from app.database import get_db
-from app.schemas.alert import AlertCreate, AlertResponse
 from app.models.alert import Alert
+from app.schemas.alert import AlertCreate, AlertResponse
 
 router = APIRouter()
 
@@ -19,7 +19,7 @@ async def create_alert(alert: AlertCreate, db: Session = Depends(get_db)):
     return db_alert
 
 
-@router.get("/api/alerts", response_model=List[AlertResponse])
+@router.get("/api/alerts", response_model=list[AlertResponse])
 async def get_alerts(db: Session = Depends(get_db)):
     """Get all alerts"""
     alerts = db.query(Alert).order_by(Alert.created_at.desc()).all()

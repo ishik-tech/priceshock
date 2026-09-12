@@ -1,9 +1,9 @@
+from app.services.data_service import DataService
 from app.services.forecasting_service import ForecastingService
 from app.services.risk_service import RiskService
-from app.services.data_service import DataService
 
 __all__ = [
+    "DataService",
     "ForecastingService",
     "RiskService",
-    "DataService",
 ]

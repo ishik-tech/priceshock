@@ -1,11 +1,11 @@
-import numpy as np
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+
+import numpy as np
 from sqlalchemy.orm import Session
 
-from app.models.product import Product
-from app.models.price_observation import PriceObservation
 from app.models.data_source import DataSource
+from app.models.price_observation import PriceObservation
+from app.models.product import Product
 from app.schemas.price_observation import PriceObservationCreate
 
 
@@ -15,7 +15,7 @@ class DataService:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_products(self, category: Optional[str] = None) -> List[Product]:
+    def get_products(self, category: str | None = None) -> list[Product]:
         """Get all products, optionally filtered by category"""
         query = self.db.query(Product)
 
@@ -24,16 +24,16 @@ class DataService:
 
         return query.all()
 
-    def get_product(self, product_id: int) -> Optional[Product]:
+    def get_product(self, product_id: int) -> Product | None:
         """Get a single product by ID"""
         return self.db.query(Product).filter(Product.id == product_id).first()
 
     def get_price_history(
         self,
         product_id: int,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None
-    ) -> List[PriceObservation]:
+        start_date: datetime | None = None,
+        end_date: datetime | None = None
+    ) -> list[PriceObservation]:
         """Get price history for a product"""
         query = self.db.query(PriceObservation).filter(
             PriceObservation.product_id == product_id
@@ -46,7 +46,7 @@ class DataService:
 
         return query.order_by(PriceObservation.date).all()
 
-    def get_latest_price(self, product_id: int) -> Optional[PriceObservation]:
+    def get_latest_price(self, product_id: int) -> PriceObservation | None:
         """Get the most recent price observation"""
         return (
             self.db.query(PriceObservation)
@@ -113,11 +113,11 @@ class DataService:
         score = max(0, score - penalties)
         return score
 
-    def get_data_source_info(self) -> Dict:
+    def get_data_source_info(self) -> dict:
         """Get information about current data source"""
         total_observations = self.db.query(PriceObservation).count()
         synthetic_count = self.db.query(PriceObservation).filter(
-            PriceObservation.is_synthetic == True
+            PriceObservation.is_synthetic.is_(True)
         ).count()
 
         data_source = self.db.query(DataSource).first()

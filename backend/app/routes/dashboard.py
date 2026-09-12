@@ -1,16 +1,17 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 from datetime import datetime
+
 import numpy as np
+from fastapi import APIRouter, Depends
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.schemas.dashboard import DashboardResponse, ProductSummary
-from app.services.data_service import DataService
-from app.services.risk_service import RiskService
 from app.models.forecast_run import ForecastRun
 from app.models.model_metrics import ModelMetrics
 from app.models.risk_score import RiskScore
-from sqlalchemy import func
+from app.schemas.dashboard import DashboardResponse, ProductSummary
+from app.services.data_service import DataService
+from app.services.risk_service import RiskService
 
 router = APIRouter()
 

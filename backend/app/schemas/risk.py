@@ -1,6 +1,6 @@
-from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+
+from pydantic import BaseModel
 
 
 class RiskResponse(BaseModel):
@@ -14,7 +14,7 @@ class RiskResponse(BaseModel):
     expected_change_pct: float
     confidence: float
     calculated_at: datetime
-    notes: Optional[str] = None
+    notes: str | None = None
 
     class Config:
         from_attributes = True

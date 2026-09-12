@@ -1,12 +1,13 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from datetime import datetime
 
 from app.database import get_db
 from app.schemas.forecast import ForecastRequest, ForecastResponse
+from app.services.data_service import DataService
 from app.services.forecasting_service import ForecastingService
 from app.services.risk_service import RiskService
-from app.services.data_service import DataService
 
 router = APIRouter()
 

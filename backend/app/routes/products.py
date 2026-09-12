@@ -1,10 +1,10 @@
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import Optional
 
 from app.database import get_db
-from app.schemas.product import ProductResponse
 from app.schemas.price_observation import PriceObservationResponse
+from app.schemas.product import ProductResponse
 from app.services.data_service import DataService
 
 router = APIRouter()
@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get("/api/products", response_model=list[ProductResponse])
 async def get_products(
-    category: Optional[str] = None,
+    category: str | None = None,
     db: Session = Depends(get_db)
 ):
     """Get all products, optionally filtered by category"""

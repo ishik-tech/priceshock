@@ -1,13 +1,13 @@
-from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, List
+
+from pydantic import BaseModel
 
 
 class ForecastPredictionSchema(BaseModel):
     forecast_date: datetime
     predicted_price: float
-    lower_bound: Optional[float] = None
-    upper_bound: Optional[float] = None
+    lower_bound: float | None = None
+    upper_bound: float | None = None
     horizon_days: int
 
     class Config:
@@ -17,7 +17,7 @@ class ForecastPredictionSchema(BaseModel):
 class ForecastRequest(BaseModel):
     product_id: int
     horizon_days: int = 30  # 7, 30, 90, 180
-    model_name: Optional[str] = None  # Auto-select if None
+    model_name: str | None = None  # Auto-select if None
 
 
 class ForecastResponse(BaseModel):
@@ -26,7 +26,7 @@ class ForecastResponse(BaseModel):
     model_used: str
     horizon_days: int
     current_price: float
-    predictions: List[ForecastPredictionSchema]
+    predictions: list[ForecastPredictionSchema]
     expected_change_pct: float
     data_quality_score: float
     forecast_generated_at: datetime

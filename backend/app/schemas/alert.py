@@ -1,6 +1,6 @@
-from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+
+from pydantic import BaseModel
 
 
 class AlertCreate(BaseModel):
@@ -20,7 +20,7 @@ class AlertResponse(BaseModel):
     condition: str
     is_active: bool
     created_at: datetime
-    last_triggered: Optional[datetime] = None
+    last_triggered: datetime | None = None
 
     class Config:
         from_attributes = True

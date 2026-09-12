@@ -1,27 +1,31 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Boolean
+from datetime import datetime
+
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
+
 from app.database import Base
 
 
 class PriceObservation(Base):
     __tablename__ = "price_observations"
 
-    id = Column(Integer, primary_key=True, index=True)
-    product_id = Column(Integer, ForeignKey("products.id"), nullable=False, index=True)
-    date = Column(DateTime, nullable=False, index=True)
-    price = Column(Float, nullable=False)
-    currency = Column(String(3), default="INR")
-    unit = Column(String(50), nullable=False)
-    region = Column(String(100), default="National")
-    source = Column(String(200), nullable=False)
-    is_synthetic = Column(Boolean, default=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False, index=True)
+    date: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
+    price: Mapped[float] = mapped_column(Float, nullable=False)
+    currency: Mapped[str] = mapped_column(String(3), default="INR")
+    unit: Mapped[str] = mapped_column(String(50), nullable=False)
+    region: Mapped[str] = mapped_column(String(100), default="National")
+    source: Mapped[str] = mapped_column(String(200), nullable=False)
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime | None] = mapped_column(server_default=func.now())
 
     # Relationship
     product = relationship("Product", back_populates="observations")
 
 
 # Add relationship to Product
-from app.models.product import Product
+from app.models.product import Product  # noqa: E402
+
 Product.observations = relationship("PriceObservation", order_by=PriceObservation.date, back_populates="product")

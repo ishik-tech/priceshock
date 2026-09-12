@@ -1,6 +1,7 @@
-import numpy as np
 import math
-from typing import Dict
+from typing import Any
+
+import numpy as np
 from sqlalchemy.orm import Session
 
 from app.models.risk_score import RiskScore
@@ -16,12 +17,12 @@ class RiskService:
         self,
         product_id: int,
         horizon_days: int = 90,
-        current_price: float = None,
-        predictions: list = None
-    ) -> Dict:
+        current_price: float | None = None,
+        predictions: list[dict[str, Any]] | None = None
+    ) -> dict:
         """Calculate price rise risk for a product"""
 
-        if not predictions or len(predictions) == 0:
+        if not predictions or current_price is None or current_price <= 0:
             return {
                 "risk_level": "UNKNOWN",
                 "probability_5pct": 0.0,
@@ -43,8 +44,10 @@ class RiskService:
         upper_bounds = [p.get("upper_bound", p["predicted_price"]) for p in predictions]
 
         # Estimate volatility from prediction intervals
-        avg_interval_width = np.mean([ub - lb for ub, lb in zip(upper_bounds, lower_bounds)])
-        relative_volatility = avg_interval_width / current_price if current_price > 0 else 1.0
+        avg_interval_width = np.mean(
+            [ub - lb for ub, lb in zip(upper_bounds, lower_bounds, strict=True)]
+        )
+        relative_volatility = avg_interval_width / current_price
 
         # Calculate probabilities based on forecast distribution
         # Using simplified approach based on expected change and volatility

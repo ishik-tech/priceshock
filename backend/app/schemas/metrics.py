@@ -1,16 +1,16 @@
-from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, List
+
+from pydantic import BaseModel
 
 
 class ModelMetricsSchema(BaseModel):
     model_name: str
     mae: float
     rmse: float
-    mape: Optional[float] = None
-    coverage: Optional[float] = None
-    train_time_seconds: Optional[float] = None
-    predict_time_seconds: Optional[float] = None
+    mape: float | None = None
+    coverage: float | None = None
+    train_time_seconds: float | None = None
+    predict_time_seconds: float | None = None
     is_baseline: bool
     sample_count: int
     evaluation_date: datetime
@@ -22,9 +22,9 @@ class ModelMetricsSchema(BaseModel):
 class ModelComparison(BaseModel):
     product_id: int
     product_name: str
-    models: List[ModelMetricsSchema]
+    models: list[ModelMetricsSchema]
     best_model: str
-    improvement_vs_baseline_pct: Optional[float] = None
+    improvement_vs_baseline_pct: float | None = None
 
 
 class ProductMetricsResponse(BaseModel):
