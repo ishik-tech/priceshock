@@ -20,34 +20,25 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [1/5] Installing backend dependencies...
+echo [1/4] Installing backend dependencies...
 cd backend
 python -m venv venv
 call venv\Scripts\activate.bat
 pip install -q -r requirements.txt
+
+echo.
+echo [2/4] Initializing database with demo data...
+python init_db.py
 cd ..
 
 echo.
-echo [2/5] Installing frontend dependencies...
+echo [3/4] Installing frontend dependencies...
 cd frontend
 call npm install
 cd ..
 
 echo.
-echo [3/5] Initializing database...
-cd backend
-python init_db.py
-cd ..
-
-echo.
-echo [4/5] Generating demo data and training models...
-cd ml
-python generate_demo_data.py
-python train.py
-cd ..
-
-echo.
-echo [5/5] Starting services...
+echo [4/4] Starting services...
 echo.
 echo Starting FastAPI backend on http://localhost:8000
 echo Starting Next.js frontend on http://localhost:3000

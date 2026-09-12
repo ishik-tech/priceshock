@@ -17,33 +17,25 @@ if ! command -v node &> /dev/null; then
     exit 1
 fi
 
-echo "[1/5] Installing backend dependencies..."
+echo "[1/4] Installing backend dependencies..."
 cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -q -r requirements.txt
+
+echo ""
+echo "[2/4] Initializing database with demo data..."
+python init_db.py
 cd ..
 
 echo ""
-echo "[2/5] Installing frontend dependencies..."
+echo "[3/4] Installing frontend dependencies..."
 cd frontend
 npm install
 cd ..
 
 echo ""
-echo "[3/5] Generating demo data..."
-cd ml
-python3 generate_demo_data.py
-cd ..
-
-echo ""
-echo "[4/5] Training models..."
-cd ml
-python3 train.py
-cd ..
-
-echo ""
-echo "[5/5] Starting services..."
+echo "[4/4] Starting services..."
 echo ""
 echo "Starting FastAPI backend on http://localhost:8000"
 echo "Starting Next.js frontend on http://localhost:3000"

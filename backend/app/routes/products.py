@@ -3,8 +3,6 @@ from sqlalchemy.orm import Session
 from typing import Optional
 
 from app.database import get_db
-from app.models.product import Product
-from app.models.price_observation import PriceObservation
 from app.schemas.product import ProductResponse
 from app.schemas.price_observation import PriceObservationResponse
 from app.services.data_service import DataService

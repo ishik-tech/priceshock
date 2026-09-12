@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timedelta
 import json
 
-from app.database import Base, init_db
+from app.database import Base
 from app.models import Product, PriceObservation, DataSource
 
 

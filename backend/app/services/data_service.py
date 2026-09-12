@@ -1,9 +1,7 @@
-import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 
 from app.models.product import Product
 from app.models.price_observation import PriceObservation

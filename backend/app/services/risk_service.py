@@ -1,12 +1,9 @@
 import numpy as np
 import math
-from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict
 from sqlalchemy.orm import Session
 
 from app.models.risk_score import RiskScore
-from app.models.forecast_run import ForecastRun
-from app.models.forecast_prediction import ForecastPrediction
 
 
 class RiskService:

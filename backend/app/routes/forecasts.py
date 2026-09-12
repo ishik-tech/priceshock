@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
-from typing import Optional
 
 from app.database import get_db
 from app.schemas.forecast import ForecastRequest, ForecastResponse
@@ -48,9 +47,9 @@ async def generate_forecast(
             detail="Insufficient historical data for a reliable forecast."
         )
 
-    # Calculate risk
+    # Calculate risk (persisted as a side effect for dashboard/top-risk queries)
     risk_service = RiskService(db)
-    risk = risk_service.calculate_risk(
+    risk_service.calculate_risk(
         product_id=product_id,
         horizon_days=request.horizon_days,
         current_price=forecast_result["current_price"],

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { api, Product, PriceObservation, ForecastResponse } from '../../../lib/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -19,9 +19,7 @@ export default function ProductDetail({ params }: Props) {
   const [horizonDays, setHorizonDays] = useState(30);
   const productId = parseInt(params.id);
 
-  useEffect(() => { loadData(); }, [productId]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -36,7 +34,9 @@ export default function ProductDetail({ params }: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [productId]);
+
+  useEffect(() => { loadData(); }, [loadData]);
 
   const handleGenerateForecast = async () => {
     try {

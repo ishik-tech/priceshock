@@ -1,9 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Optional
 
 from app.database import get_db
-from app.models.product import Product
 from app.schemas.risk import RiskResponse
 from app.services.risk_service import RiskService
 from app.services.data_service import DataService

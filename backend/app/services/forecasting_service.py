@@ -204,7 +204,6 @@ class ForecastingService:
         """Random Forest forecast"""
         try:
             from sklearn.ensemble import RandomForestRegressor
-            from sklearn.preprocessing import StandardScaler
 
             # Create features
             df_features = df.copy()
