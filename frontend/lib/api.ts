@@ -1,4 +1,12 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// In the browser we must use a relative path so requests go to the same
+// origin the page was loaded from; Next.js's rewrite (see next.config.js)
+// then forwards /api/* to the backend server-side. An absolute
+// NEXT_PUBLIC_API_URL only makes sense for server-side rendering or when the
+// backend is deployed at a truly public URL reachable directly by browsers.
+const API_BASE_URL =
+  typeof window !== 'undefined'
+    ? '' // browser: always same-origin, let the Next.js rewrite proxy it
+    : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'; // server-side rendering fallback
 
 export async function apiFetch<T>(
   endpoint: string,
